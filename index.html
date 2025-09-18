@@ -392,6 +392,8 @@
 
   <div class="mobile-button" id="menuBtn">☰</div>
 
+  <div class="mobile-button" id="mobileMenuToggle" style="bottom: 20px; right: 20px; background: linear-gradient(135deg, rgba(255, 107, 157, 0.8), rgba(102, 126, 234, 0.8)); box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);">&#9776;</div>
+
   <div class="crosshair"></div>
   
   <div id="loadingBar">
@@ -426,6 +428,34 @@
 
       document.addEventListener('gesturestart', function(e) {
         e.preventDefault();
+      });
+
+      // Toggle menu screen on mobile button click
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const blocker = document.getElementById('blocker');
+      const controlsEl = document.getElementById('controls');
+      const crosshair = document.querySelector('.crosshair');
+      const mobileControlsEl = document.getElementById('mobileControls');
+      const menuBtn = document.getElementById('menuBtn');
+
+      mobileMenuToggle.addEventListener('click', () => {
+        if (blocker.style.display === 'none') {
+          // Show menu screen
+          blocker.style.display = 'flex';
+          controlsEl.classList.remove('show');
+          crosshair.classList.remove('show');
+          mobileControlsEl.classList.remove('show');
+          menuBtn.classList.remove('show');
+          controls.unlock();
+        } else {
+          // Hide menu screen
+          blocker.style.display = 'none';
+          controlsEl.classList.add('show');
+          crosshair.classList.add('show');
+          mobileControlsEl.classList.add('show');
+          menuBtn.classList.add('show');
+          controls.lock();
+        }
       });
     }
 
