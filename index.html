@@ -296,22 +296,41 @@
     const clock = new THREE.Clock();
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     const textureLoader = new THREE.TextureLoader();
     const museumObjects = [];
-    
-    // Configuración inicial
+
+    // Detección de dispositivo móvil para optimizaciones
+    const isMobileDevice = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) ||
+                          window.innerWidth < 768 || window.innerHeight < 768;
+
+    // Configuración inicial optimizada para móvil
     scene.background = new THREE.Color(0x0a0a0a);
     scene.fog = new THREE.Fog(0x0a0a0a, 20, 120); // Fog ajustado para sala más grande
-    
+
     camera.position.set(0, 1.6, 25); // Posición inicial más alejada
-    
+
+    // Optimizaciones para móvil
+    const pixelRatio = isMobileDevice ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
+    const antialias = !isMobileDevice; // Desactivar antialiasing en móvil
+    const powerPreference = isMobileDevice ? "low-power" : "high-performance";
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: antialias,
+      powerPreference: powerPreference,
+      precision: isMobileDevice ? "mediump" : "highp"
+    });
+
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(pixelRatio);
+
+    // Sombras optimizadas para móvil
+    renderer.shadowMap.enabled = !isMobileDevice; // Desactivar sombras en móvil
+    if (!isMobileDevice) {
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    }
+
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.8;
+    renderer.toneMappingExposure = isMobileDevice ? 1.0 : 0.8; // Exposición ajustada para móvil
     document.body.appendChild(renderer.domElement);
 
     // Constantes del museo ampliado para el planetario
@@ -319,28 +338,36 @@
     const WALL_THICKNESS = 0.5;
     const WALL_LENGTH = 60; // Duplicado para dar más espacio a los planetas
 
-    // Sistema de iluminación mejorado para sala grande
+    // Sistema de iluminación optimizado para móvil
     function createLighting() {
       // Luz ambiental suave
-      const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+      const ambientLight = new THREE.AmbientLight(0x404040, isMobileDevice ? 0.6 : 0.4);
       scene.add(ambientLight);
 
-      // Luz direccional principal más potente
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      // Luz direccional principal optimizada
+      const directionalLight = new THREE.DirectionalLight(0xffffff, isMobileDevice ? 1.0 : 1.2);
       directionalLight.position.set(15, 25, 10);
-      directionalLight.castShadow = true;
-      directionalLight.shadow.mapSize.width = 4096;
-      directionalLight.shadow.mapSize.height = 4096;
-      directionalLight.shadow.camera.near = 1;
-      directionalLight.shadow.camera.far = 100;
-      directionalLight.shadow.camera.left = -50;
-      directionalLight.shadow.camera.right = 50;
-      directionalLight.shadow.camera.top = 50;
-      directionalLight.shadow.camera.bottom = -50;
+
+      if (!isMobileDevice) {
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048; // Reducido de 4096
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 100;
+        directionalLight.shadow.camera.left = -50;
+        directionalLight.shadow.camera.right = 50;
+        directionalLight.shadow.camera.top = 50;
+        directionalLight.shadow.camera.bottom = -50;
+      }
       scene.add(directionalLight);
 
-      // Más luces puntuales distribuidas por la sala ampliada
-      const artworkLights = [
+      // Luces optimizadas para móvil - menos luces y sin sombras
+      const artworkLights = isMobileDevice ? [
+        // Solo luces principales en móvil
+        { pos: [0, 10, -15], color: 0xffaa00, intensity: 1.5 }, // Iluminación especial para el Sol
+        { pos: [-15, 8, -10], color: 0x8c7853, intensity: 0.8 },
+        { pos: [15, 8, 10], color: 0xd8ca9d, intensity: 0.8 }
+      ] : [
         { pos: [-20, 6, -25], color: 0xffd700, intensity: 1.5 },
         { pos: [20, 6, -25], color: 0x64ffda, intensity: 1.5 },
         { pos: [-25, 6, 0], color: 0xff6b9d, intensity: 1.5 },
@@ -357,7 +384,9 @@
         const spotLight = new THREE.SpotLight(light.color, light.intensity, 25, Math.PI / 5, 0.3, 2);
         spotLight.position.set(...light.pos);
         spotLight.target.position.set(light.pos[0] * 0.7, 3, light.pos[2] * 0.7);
-        spotLight.castShadow = true;
+        if (!isMobileDevice) {
+          spotLight.castShadow = true;
+        }
         scene.add(spotLight);
         scene.add(spotLight.target);
       });
@@ -546,9 +575,10 @@
 
     function createPlanetSculpture(x, z, planetData) {
       const { name, radius, color, texture, description, rotationSpeed, rings } = planetData;
-      
-      // Geometría esférica para el planeta
-      const sculptureGeo = new THREE.SphereGeometry(radius, 32, 32);
+
+      // Geometría esférica optimizada para móvil
+      const sphereSegments = isMobileDevice ? 16 : 32; // Reducir segmentos en móvil
+      const sculptureGeo = new THREE.SphereGeometry(radius, sphereSegments, sphereSegments);
       
       // Material del planeta con textura procedural
       const planetTexture = createPlanetTexture(texture, color);
@@ -643,7 +673,9 @@ ${description}
 
     function createPlanetTexture(textureType, baseColor) {
       const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 512;
+      // Reducir tamaño de textura en móvil para mejor rendimiento
+      const textureSize = isMobileDevice ? 256 : 512;
+      canvas.width = canvas.height = textureSize;
       const ctx = canvas.getContext('2d');
       
       // Color base
@@ -1102,20 +1134,20 @@ ${description}
       });
     }
 
-    // Sistema de partículas ambiente para sala grande
+    // Sistema de partículas ambiente optimizado para móvil
     function createAmbientParticles() {
-      const particleCount = 200; // Más partículas para la sala más grande
+      const particleCount = isMobileDevice ? 25 : 150; // Reducido aún más en móvil
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(particleCount * 3);
       const colors = new Float32Array(particleCount * 3);
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        
+
         positions[i3] = (Math.random() - 0.5) * WALL_LENGTH * 0.9; // Distribuidas en toda la sala
         positions[i3 + 1] = Math.random() * WALL_HEIGHT * 0.8;
         positions[i3 + 2] = (Math.random() - 0.5) * WALL_LENGTH * 0.9;
-        
+
         const color = new THREE.Color();
         color.setHSL(Math.random(), 0.7, 0.5);
         colors[i3] = color.r;
@@ -1127,16 +1159,16 @@ ${description}
       geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
       const material = new THREE.PointsMaterial({
-        size: 0.08, // Partículas ligeramente más grandes
+        size: isMobileDevice ? 0.05 : 0.08, // Partículas más pequeñas en móvil
         vertexColors: true,
         transparent: true,
-        opacity: 0.4,
+        opacity: isMobileDevice ? 0.3 : 0.4, // Menos opacidad en móvil
         blending: THREE.AdditiveBlending
       });
 
       const particles = new THREE.Points(geometry, material);
       scene.add(particles);
-      
+
       return particles;
     }
 
@@ -1379,14 +1411,29 @@ FPS: ${Math.round(1 / clock.getDelta())}
     }
 
     // Añadir eventos táctiles a botones
-    document.getElementById('btnUp').addEventListener('touchstart', () => setTouchKey('ArrowUp', true));
-    document.getElementById('btnUp').addEventListener('touchend', () => setTouchKey('ArrowUp', false));
-    document.getElementById('btnLeft').addEventListener('touchstart', () => setTouchKey('ArrowLeft', true));
-    document.getElementById('btnLeft').addEventListener('touchend', () => setTouchKey('ArrowLeft', false));
-    document.getElementById('btnDown').addEventListener('touchstart', () => setTouchKey('ArrowDown', true));
-    document.getElementById('btnDown').addEventListener('touchend', () => setTouchKey('ArrowDown', false));
-    document.getElementById('btnRight').addEventListener('touchstart', () => setTouchKey('ArrowRight', true));
-    document.getElementById('btnRight').addEventListener('touchend', () => setTouchKey('ArrowRight', false));
+    function preventDefaultTouch(event) {
+      event.preventDefault();
+    }
+    const btnUp = document.getElementById('btnUp');
+    const btnLeft = document.getElementById('btnLeft');
+    const btnDown = document.getElementById('btnDown');
+    const btnRight = document.getElementById('btnRight');
+
+    btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowUp', true); });
+    btnUp.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowUp', false); });
+    btnUp.addEventListener('touchmove', preventDefaultTouch);
+
+    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowLeft', true); });
+    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowLeft', false); });
+    btnLeft.addEventListener('touchmove', preventDefaultTouch);
+
+    btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowDown', true); });
+    btnDown.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowDown', false); });
+    btnDown.addEventListener('touchmove', preventDefaultTouch);
+
+    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowRight', true); });
+    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowRight', false); });
+    btnRight.addEventListener('touchmove', preventDefaultTouch);
 
     // Modificar la función handleMovement para incluir controles táctiles
     const originalHandleMovement = handleMovement;
