@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
   <title>Museo Virtual 3D - Experiencia Inmersiva</title>
   <style>
     body {
@@ -11,6 +11,10 @@
       overflow: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #0c0c0c, #1a1a2e);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     #blocker {
@@ -70,15 +74,12 @@
       box-shadow: 0 10px 30px rgba(102,126,234,0.4);
       position: relative;
       overflow: hidden;
+      touch-action: manipulation;
     }
 
-    #startButton:hover {
+    #startButton:hover, #startButton:active {
       transform: translateY(-3px);
       box-shadow: 0 15px 40px rgba(102,126,234,0.6);
-    }
-
-    #startButton:active {
-      transform: translateY(-1px);
     }
 
     .key-hint {
@@ -165,10 +166,158 @@
       z-index: 10;
       box-shadow: 0 0 10px rgba(100,255,218,0.8);
       display: none;
+      pointer-events: none;
     }
 
     .crosshair.show {
       display: block;
+    }
+
+    /* Controles móviles */
+    #mobileControls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: none;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    #mobileControls.show {
+      display: block;
+      pointer-events: auto;
+    }
+
+    .joystick {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(100,255,218,0.5);
+      border-radius: 50%;
+      bottom: 40px;
+      left: 40px;
+      touch-action: none;
+    }
+
+    .joystick-handle {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #64ffda, #4fc3f7);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 15px rgba(100,255,218,0.4);
+      pointer-events: none;
+    }
+
+    .look-area {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 60%;
+      height: 100%;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid rgba(100,255,218,0.2);
+      border-radius: 10px 0 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      text-align: center;
+      touch-action: none;
+    }
+
+    .mobile-button {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(26,26,46,0.8));
+      border: 2px solid rgba(100,255,218,0.5);
+      border-radius: 50%;
+      color: #64ffda;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    #interactBtn {
+      bottom: 120px;
+      right: 40px;
+    }
+
+    #menuBtn {
+      top: 20px;
+      left: 20px;
+      z-index: 16;
+      display: none;
+    }
+
+    #menuBtn.show {
+      display: flex;
+    }
+
+    /* Media queries para móviles */
+    @media (max-width: 768px) {
+      #instructions {
+        padding: 20px;
+        max-width: 90%;
+      }
+      
+      #instructions h2 {
+        font-size: 2em;
+      }
+      
+      #instructions p {
+        font-size: 1em;
+      }
+      
+      #infoBox {
+        font-size: 1em;
+        padding: 15px 20px;
+        min-width: 250px;
+        bottom: 220px;
+      }
+      
+      #controls {
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 10px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      #mobileControls {
+        height: 150px;
+      }
+      
+      .joystick {
+        width: 100px;
+        height: 100px;
+        bottom: 25px;
+        left: 25px;
+      }
+      
+      .joystick-handle {
+        width: 35px;
+        height: 35px;
+      }
+      
+      #interactBtn {
+        bottom: 80px;
+        right: 25px;
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+      }
     }
 
     #loadingBar {
@@ -199,14 +348,26 @@
     <div id="instructions">
       <h2>🎨 Museo Virtual 3D</h2>
       <p>Sumérgete en una experiencia artística inmersiva</p>
-      <p>
-        Controles:
-        <br>
-        <span class="key-hint">W A S D</span> - Movimiento
-        <span class="key-hint">Mouse</span> - Mirar alrededor
-        <span class="key-hint">Click</span> - Interactuar
-      </p>
-      <p>🖼️ Explora las obras de arte y descubre sus secretos</p>
+      <div id="desktopControls">
+        <p>
+          Controles PC:
+          <br>
+          <span class="key-hint">W A S D</span> - Movimiento
+          <span class="key-hint">Mouse</span> - Mirar alrededor
+          <span class="key-hint">Click</span> - Interactuar
+        </p>
+      </div>
+      <div id="mobileControlsInfo" style="display: none;">
+        <p>
+          Controles Móvil:
+          <br>
+          <span class="key-hint">Joystick</span> - Movimiento
+          <span class="key-hint">Deslizar</span> - Mirar alrededor
+          <span class="key-hint">Botón</span> - Interactuar
+        </p>
+      </div>
+      <p>🖼️ Explora las obras de arte y descubre los secretos del sistema solar</p>
+      <p id="planetInfo" style="color: #64ffda; font-weight: bold;">🪐 Descubre los 9 cuerpos celestes de nuestro sistema solar</p>
       <button id="startButton">✨ Comenzar Experiencia</button>
     </div>
   </div>
@@ -214,10 +375,22 @@
   <div id="infoBox"></div>
   
   <div id="controls">
-    <div class="control-item"><span class="key-hint">ESC</span> Salir</div>
+    <div class="control-item"><span class="key-hint">ESC/☰</span> Menú</div>
     <div class="control-item"><span class="key-hint">F</span> Pantalla completa</div>
     <div class="control-item"><span class="key-hint">H</span> Ocultar ayuda</div>
   </div>
+
+  <div id="mobileControls">
+    <div class="joystick" id="joystick">
+      <div class="joystick-handle" id="joystickHandle"></div>
+    </div>
+    <div class="look-area" id="lookArea">
+      Desliza para mirar
+    </div>
+    <div class="mobile-button" id="interactBtn">👆</div>
+  </div>
+
+  <div class="mobile-button" id="menuBtn">☰</div>
 
   <div class="crosshair"></div>
   
@@ -228,7 +401,35 @@
   <script type="module">
     import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.min.js';
 
-    // Simulación de PointerLockControls simplificada
+    // Detección de dispositivo móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                     ('ontouchstart' in window) || 
+                     (navigator.maxTouchPoints > 0);
+
+    // Configurar interfaz según dispositivo
+    if (isMobile) {
+      document.getElementById('desktopControls').style.display = 'none';
+      document.getElementById('mobileControlsInfo').style.display = 'block';
+      
+      // Prevenir zoom y scroll en móviles
+      document.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 1) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 1) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      document.addEventListener('gesturestart', function(e) {
+        e.preventDefault();
+      });
+    }
+
+    // Simulación de PointerLockControls mejorada para móviles
     class PointerLockControls extends THREE.EventDispatcher {
       constructor(camera, domElement) {
         super();
@@ -243,17 +444,29 @@
       }
 
       init() {
-        this.domElement.addEventListener('click', () => this.lock());
-        document.addEventListener('pointerlockchange', () => this.onPointerlockChange());
-        document.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        if (!isMobile) {
+          this.domElement.addEventListener('click', () => this.lock());
+          document.addEventListener('pointerlockchange', () => this.onPointerlockChange());
+          document.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        }
       }
 
       lock() {
-        this.domElement.requestPointerLock();
+        if (isMobile) {
+          this.dispatchEvent({ type: 'lock' });
+          this.isLocked = true;
+        } else {
+          this.domElement.requestPointerLock();
+        }
       }
 
       unlock() {
-        document.exitPointerLock();
+        if (isMobile) {
+          this.dispatchEvent({ type: 'unlock' });
+          this.isLocked = false;
+        } else {
+          document.exitPointerLock();
+        }
       }
 
       onPointerlockChange() {
@@ -280,6 +493,18 @@
         this.camera.quaternion.setFromEuler(this.euler);
       }
 
+      // Método para controles móviles
+      updateRotation(deltaX, deltaY) {
+        if (!this.isLocked) return;
+
+        this.euler.setFromQuaternion(this.camera.quaternion);
+        this.euler.y -= deltaX * 0.003;
+        this.euler.x -= deltaY * 0.003;
+        this.euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.euler.x));
+
+        this.camera.quaternion.setFromEuler(this.euler);
+      }
+
       moveForward(distance) {
         this.direction.setFromMatrixColumn(this.camera.matrix, 0);
         this.direction.crossVectors(this.camera.up, this.direction);
@@ -296,84 +521,186 @@
     const clock = new THREE.Clock();
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     const textureLoader = new THREE.TextureLoader();
     const museumObjects = [];
-
-    // Detección de dispositivo móvil para optimizaciones
-    const isMobileDevice = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) ||
-                          window.innerWidth < 768 || window.innerHeight < 768;
-
-    // Configuración inicial optimizada para móvil
+    
+    // Configuración inicial
     scene.background = new THREE.Color(0x0a0a0a);
-    scene.fog = new THREE.Fog(0x0a0a0a, 20, 120); // Fog ajustado para sala más grande
-
-    camera.position.set(0, 1.6, 25); // Posición inicial más alejada
-
-    // Optimizaciones para móvil
-    const pixelRatio = isMobileDevice ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2);
-    const antialias = !isMobileDevice; // Desactivar antialiasing en móvil
-    const powerPreference = isMobileDevice ? "low-power" : "high-performance";
-
-    const renderer = new THREE.WebGLRenderer({
-      antialias: antialias,
-      powerPreference: powerPreference,
-      precision: isMobileDevice ? "mediump" : "highp"
-    });
-
+    scene.fog = new THREE.Fog(0x0a0a0a, 20, 120);
+    
+    camera.position.set(0, 1.6, 25);
+    
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(pixelRatio);
-
-    // Sombras optimizadas para móvil
-    renderer.shadowMap.enabled = !isMobileDevice; // Desactivar sombras en móvil
-    if (!isMobileDevice) {
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    }
-
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = isMobileDevice ? 1.0 : 0.8; // Exposición ajustada para móvil
+    renderer.toneMappingExposure = 0.8;
     document.body.appendChild(renderer.domElement);
 
-    // Constantes del museo ampliado para el planetario
+    // Constantes del museo
     const WALL_HEIGHT = 20;
     const WALL_THICKNESS = 0.5;
-    const WALL_LENGTH = 60; // Duplicado para dar más espacio a los planetas
+    const WALL_LENGTH = 60;
 
-    // Sistema de iluminación optimizado para móvil
+    // Sistema de controles móviles
+    class MobileControls {
+      constructor() {
+        this.joystick = document.getElementById('joystick');
+        this.joystickHandle = document.getElementById('joystickHandle');
+        this.lookArea = document.getElementById('lookArea');
+        
+        this.joystickCenter = { x: 0, y: 0 };
+        this.joystickOffset = { x: 0, y: 0 };
+        this.isJoystickActive = false;
+        
+        this.lookStartPos = { x: 0, y: 0 };
+        this.isLookActive = false;
+        
+        this.movement = { x: 0, y: 0 };
+        this.look = { x: 0, y: 0 };
+        
+        this.init();
+      }
+      
+      init() {
+        // Joystick events
+        this.joystick.addEventListener('touchstart', (e) => this.onJoystickStart(e), { passive: false });
+        document.addEventListener('touchmove', (e) => this.onJoystickMove(e), { passive: false });
+        document.addEventListener('touchend', (e) => this.onJoystickEnd(e), { passive: false });
+        
+        // Look area events
+        this.lookArea.addEventListener('touchstart', (e) => this.onLookStart(e), { passive: false });
+        this.lookArea.addEventListener('touchmove', (e) => this.onLookMove(e), { passive: false });
+        this.lookArea.addEventListener('touchend', (e) => this.onLookEnd(e), { passive: false });
+        
+        // Interact button
+        document.getElementById('interactBtn').addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          this.onInteract();
+        }, { passive: false });
+      }
+      
+      onJoystickStart(e) {
+        e.preventDefault();
+        this.isJoystickActive = true;
+        
+        const rect = this.joystick.getBoundingClientRect();
+        this.joystickCenter.x = rect.left + rect.width / 2;
+        this.joystickCenter.y = rect.top + rect.height / 2;
+        
+        const touch = e.touches[0];
+        this.updateJoystick(touch.clientX, touch.clientY);
+      }
+      
+      onJoystickMove(e) {
+        if (!this.isJoystickActive) return;
+        e.preventDefault();
+        
+        const touch = e.touches[0];
+        this.updateJoystick(touch.clientX, touch.clientY);
+      }
+      
+      onJoystickEnd(e) {
+        if (!this.isJoystickActive) return;
+        e.preventDefault();
+        
+        this.isJoystickActive = false;
+        this.joystickOffset = { x: 0, y: 0 };
+        this.movement = { x: 0, y: 0 };
+        
+        this.joystickHandle.style.transform = 'translate(-50%, -50%)';
+      }
+      
+      updateJoystick(clientX, clientY) {
+        const deltaX = clientX - this.joystickCenter.x;
+        const deltaY = clientY - this.joystickCenter.y;
+        
+        const distance = Math.min(40, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+        const angle = Math.atan2(deltaY, deltaX);
+        
+        this.joystickOffset.x = distance * Math.cos(angle);
+        this.joystickOffset.y = distance * Math.sin(angle);
+        
+        this.movement.x = this.joystickOffset.x / 40;
+        this.movement.y = -this.joystickOffset.y / 40;
+        
+        this.joystickHandle.style.transform = 
+          `translate(-50%, -50%) translate(${this.joystickOffset.x}px, ${this.joystickOffset.y}px)`;
+      }
+      
+      onLookStart(e) {
+        e.preventDefault();
+        this.isLookActive = true;
+        
+        const touch = e.touches[0];
+        this.lookStartPos.x = touch.clientX;
+        this.lookStartPos.y = touch.clientY;
+      }
+      
+      onLookMove(e) {
+        if (!this.isLookActive) return;
+        e.preventDefault();
+        
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - this.lookStartPos.x;
+        const deltaY = touch.clientY - this.lookStartPos.y;
+        
+        this.look.x = deltaX;
+        this.look.y = deltaY;
+        
+        this.lookStartPos.x = touch.clientX;
+        this.lookStartPos.y = touch.clientY;
+      }
+      
+      onLookEnd(e) {
+        e.preventDefault();
+        this.isLookActive = false;
+        this.look = { x: 0, y: 0 };
+      }
+      
+      onInteract() {
+        // Simular click en el centro de la pantalla
+        const event = new Event('mobileInteract');
+        document.dispatchEvent(event);
+      }
+      
+      getMovement() {
+        return this.movement;
+      }
+      
+      getLook() {
+        const look = { ...this.look };
+        this.look = { x: 0, y: 0 }; // Reset después de leer
+        return look;
+      }
+    }
+
+    // Sistema de iluminación
     function createLighting() {
-      // Luz ambiental suave
-      const ambientLight = new THREE.AmbientLight(0x404040, isMobileDevice ? 0.6 : 0.4);
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
       scene.add(ambientLight);
 
-      // Luz direccional principal optimizada
-      const directionalLight = new THREE.DirectionalLight(0xffffff, isMobileDevice ? 1.0 : 1.2);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
       directionalLight.position.set(15, 25, 10);
-
-      if (!isMobileDevice) {
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048; // Reducido de 4096
-        directionalLight.shadow.mapSize.height = 2048;
-        directionalLight.shadow.camera.near = 1;
-        directionalLight.shadow.camera.far = 100;
-        directionalLight.shadow.camera.left = -50;
-        directionalLight.shadow.camera.right = 50;
-        directionalLight.shadow.camera.top = 50;
-        directionalLight.shadow.camera.bottom = -50;
-      }
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+      directionalLight.shadow.camera.near = 1;
+      directionalLight.shadow.camera.far = 100;
+      directionalLight.shadow.camera.left = -50;
+      directionalLight.shadow.camera.right = 50;
+      directionalLight.shadow.camera.top = 50;
+      directionalLight.shadow.camera.bottom = -50;
       scene.add(directionalLight);
 
-      // Luces optimizadas para móvil - menos luces y sin sombras
-      const artworkLights = isMobileDevice ? [
-        // Solo luces principales en móvil
-        { pos: [0, 10, -15], color: 0xffaa00, intensity: 1.5 }, // Iluminación especial para el Sol
-        { pos: [-15, 8, -10], color: 0x8c7853, intensity: 0.8 },
-        { pos: [15, 8, 10], color: 0xd8ca9d, intensity: 0.8 }
-      ] : [
+      const artworkLights = [
         { pos: [-20, 6, -25], color: 0xffd700, intensity: 1.5 },
         { pos: [20, 6, -25], color: 0x64ffda, intensity: 1.5 },
         { pos: [-25, 6, 0], color: 0xff6b9d, intensity: 1.5 },
         { pos: [25, 6, 0], color: 0x4fc3f7, intensity: 1.5 },
-        // Luces adicionales para los planetas
-        { pos: [0, 10, -15], color: 0xffaa00, intensity: 2 }, // Iluminación especial para el Sol
+        { pos: [0, 10, -15], color: 0xffaa00, intensity: 2 },
         { pos: [-15, 8, -10], color: 0x8c7853, intensity: 1 },
         { pos: [-20, 8, 5], color: 0xffc649, intensity: 1 },
         { pos: [15, 8, 10], color: 0xd8ca9d, intensity: 1.2 },
@@ -384,31 +711,26 @@
         const spotLight = new THREE.SpotLight(light.color, light.intensity, 25, Math.PI / 5, 0.3, 2);
         spotLight.position.set(...light.pos);
         spotLight.target.position.set(light.pos[0] * 0.7, 3, light.pos[2] * 0.7);
-        if (!isMobileDevice) {
-          spotLight.castShadow = true;
-        }
+        spotLight.castShadow = true;
         scene.add(spotLight);
         scene.add(spotLight.target);
       });
     }
 
-    // Creación del suelo con patrón
+    // Creación del suelo
     function createFloor() {
       const floorGeometry = new THREE.PlaneGeometry(WALL_LENGTH, WALL_LENGTH, 50, 50);
       
-      // Material del suelo con patrón de mármol
       const floorMaterial = new THREE.MeshStandardMaterial({
         color: 0x2a2a2a,
         roughness: 0.8,
         metalness: 0.1
       });
 
-      // Crear patrón de baldosas
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = 512;
       const ctx = canvas.getContext('2d');
       
-      // Patrón de damero elegante
       const tileSize = 64;
       for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
@@ -430,7 +752,7 @@
       scene.add(floor);
     }
 
-    // Paredes con texturas procedurales
+    // Paredes
     function createWalls() {
       const wallMaterial = new THREE.MeshStandardMaterial({
         color: 0x1a1a2e,
@@ -438,7 +760,6 @@
         metalness: 0.1
       });
 
-      // Crear textura de pared procedural
       const wallCanvas = document.createElement('canvas');
       wallCanvas.width = wallCanvas.height = 256;
       const wallCtx = wallCanvas.getContext('2d');
@@ -456,7 +777,6 @@
       
       wallMaterial.map = wallTexture;
 
-      // Paredes
       const walls = [
         { size: [WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS], pos: [0, WALL_HEIGHT/2, -WALL_LENGTH/2] },
         { size: [WALL_THICKNESS, WALL_HEIGHT, WALL_LENGTH], pos: [-WALL_LENGTH/2, WALL_HEIGHT/2, 0] },
@@ -471,10 +791,8 @@
         scene.add(mesh);
       });
 
-      // Pared frontal con entrada
       createEntranceWall();
       
-      // Techo
       const ceilingGeometry = new THREE.PlaneGeometry(WALL_LENGTH, WALL_LENGTH);
       const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0x0a0a0a });
       const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
@@ -484,10 +802,9 @@
     }
 
     function createEntranceWall() {
-      const doorWidth = 8; // Puerta más grande para la escala
+      const doorWidth = 8;
       const doorHeight = 10;
       
-      // Paredes laterales de la entrada
       const leftWallGeo = new THREE.BoxGeometry((WALL_LENGTH - doorWidth) / 2, WALL_HEIGHT, WALL_THICKNESS);
       const rightWallGeo = new THREE.BoxGeometry((WALL_LENGTH - doorWidth) / 2, WALL_HEIGHT, WALL_THICKNESS);
       const topWallGeo = new THREE.BoxGeometry(doorWidth, WALL_HEIGHT - doorHeight, WALL_THICKNESS);
@@ -507,9 +824,8 @@
       scene.add(topWall);
     }
 
-    // Obras de arte mejoradas
+    // Obras de arte
     function createArtwork(x, y, z, rotationY, title, description, color = 0xffffff) {
-      // Marco elegante
       const frameGeo = new THREE.BoxGeometry(4.5, 3.5, 0.2);
       const frameMat = new THREE.MeshStandardMaterial({ 
         color: 0x8b4513,
@@ -521,7 +837,6 @@
       frame.rotation.y = rotationY;
       frame.castShadow = true;
       
-      // Canvas con arte procedural
       const canvasGeo = new THREE.PlaneGeometry(4, 3);
       const artwork = createProceduralArt(color);
       const canvasMat = new THREE.MeshStandardMaterial({ 
@@ -533,7 +848,6 @@
       canvas.position.z = rotationY === Math.PI ? -0.11 : 0.11;
       frame.add(canvas);
       
-      // Placa informativa
       const plateGeo = new THREE.PlaneGeometry(3, 0.5);
       const plateMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a });
       const plate = new THREE.Mesh(plateGeo, plateMat);
@@ -552,11 +866,9 @@
       canvas.width = canvas.height = 512;
       const ctx = canvas.getContext('2d');
       
-      // Fondo base
       ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
       ctx.fillRect(0, 0, 512, 512);
       
-      // Patrón artístico procedural
       ctx.globalCompositeOperation = 'multiply';
       for (let i = 0; i < 50; i++) {
         ctx.beginPath();
@@ -575,12 +887,9 @@
 
     function createPlanetSculpture(x, z, planetData) {
       const { name, radius, color, texture, description, rotationSpeed, rings } = planetData;
-
-      // Geometría esférica optimizada para móvil
-      const sphereSegments = isMobileDevice ? 16 : 32; // Reducir segmentos en móvil
-      const sculptureGeo = new THREE.SphereGeometry(radius, sphereSegments, sphereSegments);
       
-      // Material del planeta con textura procedural
+      const sculptureGeo = new THREE.SphereGeometry(radius, 32, 32);
+      
       const planetTexture = createPlanetTexture(texture, color);
       const sculptureMat = new THREE.MeshStandardMaterial({ 
         map: planetTexture,
@@ -596,9 +905,7 @@
       sculpture.castShadow = name !== 'Sol';
       sculpture.receiveShadow = false;
       
-      // Efectos especiales para algunos planetas
       if (name === 'Sol') {
-        // Resplandor solar
         const glowGeo = new THREE.SphereGeometry(radius * 1.2, 16, 16);
         const glowMat = new THREE.MeshBasicMaterial({
           color: 0xffaa00,
@@ -610,7 +917,6 @@
         sculpture.add(glow);
       }
       
-      // Anillos para Saturno, Urano y Neptuno
       if (rings) {
         const ringGeo = new THREE.RingGeometry(radius * 1.3, radius * 2, 32);
         const ringMat = new THREE.MeshBasicMaterial({
@@ -624,10 +930,9 @@
         sculpture.add(ring);
       }
       
-      // Pedestal con información del planeta
       const pedestalGeo = new THREE.CylinderGeometry(2.5, 3, 1.2, 8);
-      const pedestalMat = new THREE.MeshStandardMaterial({
-        color: 0x3d2817,
+      const pedestalMat = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a2e,
         metalness: 0.3,
         roughness: 0.7
       });
@@ -637,7 +942,6 @@
       pedestal.receiveShadow = true;
       scene.add(pedestal);
       
-      // Placa del planeta
       const plateGeo = new THREE.CylinderGeometry(2.3, 2.3, 0.1, 16);
       const plateMat = new THREE.MeshStandardMaterial({ 
         color: 0x333333,
@@ -648,7 +952,6 @@
       plate.position.set(x, 1.25, z);
       scene.add(plate);
       
-      // Datos del planeta
       const planetInfo = `🪐 ${name}
       
 ${description}
@@ -673,18 +976,14 @@ ${description}
 
     function createPlanetTexture(textureType, baseColor) {
       const canvas = document.createElement('canvas');
-      // Reducir tamaño de textura en móvil para mejor rendimiento
-      const textureSize = isMobileDevice ? 256 : 512;
-      canvas.width = canvas.height = textureSize;
+      canvas.width = canvas.height = 512;
       const ctx = canvas.getContext('2d');
       
-      // Color base
       ctx.fillStyle = `#${baseColor.toString(16).padStart(6, '0')}`;
       ctx.fillRect(0, 0, 512, 512);
       
       switch(textureType) {
         case 'rocky':
-          // Textura rocosa con cráteres
           ctx.globalCompositeOperation = 'multiply';
           for (let i = 0; i < 30; i++) {
             ctx.beginPath();
@@ -695,7 +994,6 @@ ${description}
           break;
           
         case 'gas':
-          // Bandas de gas
           ctx.globalCompositeOperation = 'overlay';
           for (let i = 0; i < 512; i += 20) {
             ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.3)`;
@@ -704,7 +1002,6 @@ ${description}
           break;
           
         case 'ice':
-          // Textura helada
           ctx.globalCompositeOperation = 'screen';
           for (let i = 0; i < 100; i++) {
             ctx.beginPath();
@@ -715,7 +1012,6 @@ ${description}
           break;
           
         case 'earth':
-          // Continentes y océanos simplificados
           ctx.globalCompositeOperation = 'multiply';
           ctx.fillStyle = '#4a9eff';
           ctx.fillRect(0, 0, 512, 512);
@@ -729,7 +1025,6 @@ ${description}
           break;
           
         case 'solar':
-          // Superficie solar con erupciones
           ctx.globalCompositeOperation = 'screen';
           for (let i = 0; i < 50; i++) {
             ctx.beginPath();
@@ -745,184 +1040,109 @@ ${description}
 
     // Crear contenido del museo
     function createMuseumContent() {
-      // Obras en las paredes (ajustadas para sala más grande)
       const artworks = [
         { pos: [-20, 4, -29.7], rot: 0, title: "Sinfonía Dorada", desc: "Una composición visual que captura la armonía entre luz y sombra.", color: 0xffd700 },
         { pos: [20, 4, -29.7], rot: 0, title: "Océano Digital", desc: "Exploración de las corrientes virtuales en el mundo moderno.", color: 0x64ffda },
         { pos: [-29.7, 4, 0], rot: Math.PI/2, title: "Pasión Carmesí", desc: "Una expresión ardiente del alma humana.", color: 0xff6b9d },
         { pos: [29.7, 4, 0], rot: -Math.PI/2, title: "Cielo Infinito", desc: "Contemplación de la vastedad celestial.", color: 0x4fc3f7 },
-        // Obras adicionales para llenar la sala más grande
         { pos: [-10, 4, -29.7], rot: 0, title: "Aurora Boreal", desc: "Danza de partículas en la magnetosfera terrestre.", color: 0x00ff88 },
         { pos: [10, 4, -29.7], rot: 0, title: "Nebulosa Cósmica", desc: "Cuna de estrellas en el espacio profundo.", color: 0x9966ff },
         { pos: [-29.7, 4, -10], rot: Math.PI/2, title: "Galaxia Espiral", desc: "Millones de estrellas girando en perfecta armonía.", color: 0xffffff },
-        { pos: [-29.7, 4, 10], rot: Math.PI/2, title: "Agujero Negro", desc: "Donde el tiempo y el espacio se curvan infinitamente.", color: 0x330066 },
-        // Nuevos cuadros adicionales para más arte en las paredes
-        { pos: [-15, 4, -29.7], rot: 0, title: "Luz Crepuscular", desc: "Captura la transición entre el día y la noche.", color: 0xffa500 },
-        { pos: [15, 4, -29.7], rot: 0, title: "Reflejos Urbanos", desc: "Explora la interacción de luces en la ciudad moderna.", color: 0x4682b4 },
-        { pos: [-29.7, 4, -15], rot: Math.PI/2, title: "Bosque Encantado", desc: "Un viaje a través de un bosque mágico y misterioso.", color: 0x228b22 },
-        { pos: [29.7, 4, -15], rot: -Math.PI/2, title: "Horizonte Infinito", desc: "La vastedad del cielo y el mar.", color: 0x1e90ff }
+        { pos: [-29.7, 4, 10], rot: Math.PI/2, title: "Agujero Negro", desc: "Donde el tiempo y el espacio se curvan infinitamente.", color: 0x330066 }
       ];
       
       artworks.forEach(art => {
         createArtwork(...art.pos, art.rot, art.title, art.desc, art.color);
       });
       
-      // Datos completos de los planetas del sistema solar
       const planetsData = [
         {
-          name: "Sol",
-          radius: 2.5,
-          color: 0xffaa00,
-          texture: 'solar',
-          rotationSpeed: 0.5,
-          realRadius: "696.340",
-          distanceFromSun: "0 km (centro del sistema)",
-          dayLength: "25-35 días terrestres (rotación)",
-          yearLength: "N/A",
-          temperature: "5.778 K superficie",
+          name: "Sol", radius: 2.5, color: 0xffaa00, texture: 'solar', rotationSpeed: 0.5,
+          realRadius: "696.340", distanceFromSun: "0 km (centro del sistema)",
+          dayLength: "25-35 días terrestres (rotación)", yearLength: "N/A", temperature: "5.778 K superficie",
           description: "Estrella enana amarilla que contiene el 99.86% de la masa del sistema solar. Su núcleo alcanza 15 millones de grados Celsius.",
           rings: null
         },
         {
-          name: "Mercurio",
-          radius: 0.8,
-          color: 0x8c7853,
-          texture: 'rocky',
-          rotationSpeed: 2.0,
-          realRadius: "2.439",
-          distanceFromSun: "57.9 millones km",
-          dayLength: "59 días terrestres",
-          yearLength: "88 días terrestres",
-          temperature: "-173°C a 427°C",
+          name: "Mercurio", radius: 0.8, color: 0x8c7853, texture: 'rocky', rotationSpeed: 2.0,
+          realRadius: "2.439", distanceFromSun: "57.9 millones km", dayLength: "59 días terrestres", 
+          yearLength: "88 días terrestres", temperature: "-173°C a 427°C",
           description: "El planeta más cercano al Sol. Su superficie está cubierta de cráteres y no tiene atmósfera significativa.",
           rings: null
         },
         {
-          name: "Venus",
-          radius: 1.0,
-          color: 0xffc649,
-          texture: 'rocky',
-          rotationSpeed: -1.5,
-          realRadius: "6.051",
-          distanceFromSun: "108.2 millones km",
-          dayLength: "243 días terrestres",
-          yearLength: "225 días terrestres",
-          temperature: "462°C promedio",
+          name: "Venus", radius: 1.0, color: 0xffc649, texture: 'rocky', rotationSpeed: -1.5,
+          realRadius: "6.051", distanceFromSun: "108.2 millones km", dayLength: "243 días terrestres",
+          yearLength: "225 días terrestres", temperature: "462°C promedio",
           description: "El planeta más caliente del sistema solar debido a su efecto invernadero extremo. Tiene nubes de ácido sulfúrico.",
           rings: null
         },
         {
-          name: "Tierra",
-          radius: 1.1,
-          color: 0x6b93d6,
-          texture: 'earth',
-          rotationSpeed: 3.0,
-          realRadius: "6.371",
-          distanceFromSun: "149.6 millones km",
-          dayLength: "24 horas",
-          yearLength: "365.25 días",
-          temperature: "15°C promedio",
+          name: "Tierra", radius: 1.1, color: 0x6b93d6, texture: 'earth', rotationSpeed: 3.0,
+          realRadius: "6.371", distanceFromSun: "149.6 millones km", dayLength: "24 horas",
+          yearLength: "365.25 días", temperature: "15°C promedio",
           description: "Nuestro hogar. El único planeta conocido con vida. Tiene agua líquida, atmósfera respirable y campo magnético protector.",
           rings: null
         },
         {
-          name: "Marte",
-          radius: 0.9,
-          color: 0xcd5c5c,
-          texture: 'rocky',
-          rotationSpeed: 2.5,
-          realRadius: "3.389",
-          distanceFromSun: "227.9 millones km",
-          dayLength: "24.6 horas",
-          yearLength: "687 días terrestres",
-          temperature: "-65°C promedio",
+          name: "Marte", radius: 0.9, color: 0xcd5c5c, texture: 'rocky', rotationSpeed: 2.5,
+          realRadius: "3.389", distanceFromSun: "227.9 millones km", dayLength: "24.6 horas",
+          yearLength: "687 días terrestres", temperature: "-65°C promedio",
           description: "El planeta rojo. Tiene casquetes polares de hielo y la montaña más alta del sistema solar: Olympus Mons.",
           rings: null
         },
         {
-          name: "Júpiter",
-          radius: 2.2,
-          color: 0xd8ca9d,
-          texture: 'gas',
-          rotationSpeed: 4.0,
-          realRadius: "69.911",
-          distanceFromSun: "778.5 millones km",
-          dayLength: "9.9 horas",
-          yearLength: "11.9 años terrestres",
-          temperature: "-110°C promedio",
+          name: "Júpiter", radius: 2.2, color: 0xd8ca9d, texture: 'gas', rotationSpeed: 4.0,
+          realRadius: "69.911", distanceFromSun: "778.5 millones km", dayLength: "9.9 horas",
+          yearLength: "11.9 años terrestres", temperature: "-110°C promedio",
           description: "El gigante gaseoso más grande. Su Gran Mancha Roja es una tormenta del tamaño de la Tierra. Tiene más de 80 lunas.",
           rings: null
         },
         {
-          name: "Saturno",
-          radius: 2.0,
-          color: 0xfad5a5,
-          texture: 'gas',
-          rotationSpeed: 3.5,
-          realRadius: "58.232",
-          distanceFromSun: "1.432 mil millones km",
-          dayLength: "10.7 horas",
-          yearLength: "29.5 años terrestres",
-          temperature: "-140°C promedio",
+          name: "Saturno", radius: 2.0, color: 0xfad5a5, texture: 'gas', rotationSpeed: 3.5,
+          realRadius: "58.232", distanceFromSun: "1.432 mil millones km", dayLength: "10.7 horas",
+          yearLength: "29.5 años terrestres", temperature: "-140°C promedio",
           description: "Famoso por sus espectaculares anillos de hielo y roca. Es menos denso que el agua.",
           rings: { color: 0xcccccc }
         },
         {
-          name: "Urano",
-          radius: 1.6,
-          color: 0x4fd0e7,
-          texture: 'ice',
-          rotationSpeed: 2.0,
-          realRadius: "25.362",
-          distanceFromSun: "2.867 mil millones km",
-          dayLength: "17.2 horas",
-          yearLength: "84 años terrestres",
-          temperature: "-195°C promedio",
+          name: "Urano", radius: 1.6, color: 0x4fd0e7, texture: 'ice', rotationSpeed: 2.0,
+          realRadius: "25.362", distanceFromSun: "2.867 mil millones km", dayLength: "17.2 horas",
+          yearLength: "84 años terrestres", temperature: "-195°C promedio",
           description: "Gigante de hielo que rota de lado. Tiene anillos verticales y una atmósfera de hidrógeno, helio y metano.",
           rings: { color: 0x80bfff }
         },
         {
-          name: "Neptuno",
-          radius: 1.5,
-          color: 0x4b70dd,
-          texture: 'ice',
-          rotationSpeed: 2.8,
-          realRadius: "24.622",
-          distanceFromSun: "4.515 mil millones km",
-          dayLength: "16.1 horas",
-          yearLength: "165 años terrestres",
-          temperature: "-200°C promedio",
+          name: "Neptuno", radius: 1.5, color: 0x4b70dd, texture: 'ice', rotationSpeed: 2.8,
+          realRadius: "24.622", distanceFromSun: "4.515 mil millones km", dayLength: "16.1 horas",
+          yearLength: "165 años terrestres", temperature: "-200°C promedio",
           description: "El planeta más ventoso con vientos de hasta 2.100 km/h. Su color azul se debe al metano en su atmósfera.",
           rings: { color: 0x6699ff }
         }
       ];
       
-      // Posiciones distribuidas en espiral amplia para los planetas
       const positions = [
-        { x: 0, z: -20 },     // Sol (centro-atrás, más separado)
-        { x: -10, z: -15 },   // Mercurio
-        { x: -18, z: -8 },    // Venus  
-        { x: -20, z: 2 },     // Tierra
-        { x: -15, z: 12 },    // Marte
-        { x: -5, z: 18 },     // Júpiter
-        { x: 8, z: 15 },      // Saturno
-        { x: 18, z: 5 },      // Urano
-        { x: 20, z: -8 },     // Neptuno
+        { x: 0, z: -20 }, { x: -10, z: -15 }, { x: -18, z: -8 }, { x: -20, z: 2 },
+        { x: -15, z: 12 }, { x: -5, z: 18 }, { x: 8, z: 15 }, { x: 18, z: 5 }, { x: 20, z: -8 }
       ];
       
-      // Crear todos los planetas
       planetsData.forEach((planet, index) => {
         const pos = positions[index];
         createPlanetSculpture(pos.x, pos.z, planet);
       });
     }
 
-    // Sistema de controles mejorado
+    // Sistema de controles
     const controls = new PointerLockControls(camera, renderer.domElement);
     const keys = {};
-    const moveSpeed = 12.0; // Velocidad aumentada para la sala más grande
-    const sprintSpeed = 18.0; // Sprint más rápido
-    const collisionMargin = 2; // Margen de colisión aumentado
+    const moveSpeed = 12.0;
+    const sprintSpeed = 18.0;
+    const collisionMargin = 2;
+    
+    let mobileControls;
+    if (isMobile) {
+      mobileControls = new MobileControls();
+    }
 
     // Eventos de controles
     document.addEventListener('keydown', (e) => {
@@ -949,10 +1169,22 @@ ${description}
       let forward = 0, right = 0;
       const currentSpeed = keys['ShiftLeft'] ? sprintSpeed : moveSpeed;
 
-      if (keys['KeyW']) forward += 1;
-      if (keys['KeyS']) forward -= 1;
-      if (keys['KeyD']) right += 1;
-      if (keys['KeyA']) right -= 1;
+      if (isMobile && mobileControls) {
+        const movement = mobileControls.getMovement();
+        const look = mobileControls.getLook();
+        
+        forward = movement.y;
+        right = movement.x;
+        
+        if (look.x !== 0 || look.y !== 0) {
+          controls.updateRotation(look.x, look.y);
+        }
+      } else {
+        if (keys['KeyW']) forward += 1;
+        if (keys['KeyS']) forward -= 1;
+        if (keys['KeyD']) right += 1;
+        if (keys['KeyA']) right -= 1;
+      }
 
       const length = Math.hypot(forward, right);
       if (length > 0) {
@@ -963,22 +1195,19 @@ ${description}
       controls.moveForward(forward * currentSpeed * delta);
       controls.moveRight(right * currentSpeed * delta);
 
-      // Colisiones
       applyCollisions();
-      camera.position.y = 1.6; // Altura fija
+      camera.position.y = 1.6;
     }
 
     function applyCollisions() {
       const pos = camera.position;
       const margin = collisionMargin;
       
-      // Límites de paredes
       const minX = -WALL_LENGTH/2 + margin;
       const maxX = WALL_LENGTH/2 - margin;
       const minZ = -WALL_LENGTH/2 + margin;
       const maxZ = WALL_LENGTH/2 - margin;
       
-      // Entrada más grande
       const doorWidth = 8;
       const doorXMin = -doorWidth/2;
       const doorXMax = doorWidth/2;
@@ -995,21 +1224,28 @@ ${description}
 
     // Sistema de interacción
     const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
     const infoBox = document.getElementById('infoBox');
     let currentInfoTimeout;
 
     document.addEventListener('click', (event) => {
       if (!controls.isLocked) return;
+      checkInteraction();
+    });
 
-      raycaster.setFromCamera({ x: 0, y: 0 }, camera); // Centro de pantalla
+    document.addEventListener('mobileInteract', (event) => {
+      if (!controls.isLocked) return;
+      checkInteraction();
+    });
+
+    function checkInteraction() {
+      raycaster.setFromCamera({ x: 0, y: 0 }, camera);
       const intersects = raycaster.intersectObjects(museumObjects);
 
       if (intersects.length > 0) {
         const obj = intersects[0].object;
         showInfo(obj.userData.info);
       }
-    });
+    }
 
     function showInfo(text) {
       if (currentInfoTimeout) clearTimeout(currentInfoTimeout);
@@ -1022,10 +1258,11 @@ ${description}
       }, 5000);
     }
 
-    // Funciones de utilidad
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log('Fullscreen no disponible:', err);
+        });
       } else {
         document.exitFullscreen();
       }
@@ -1043,28 +1280,34 @@ ${description}
       createWalls();
       createMuseumContent();
       
-      // Configurar interfaz
       const blocker = document.getElementById('blocker');
       const startButton = document.getElementById('startButton');
       const controlsEl = document.getElementById('controls');
       const crosshair = document.querySelector('.crosshair');
-      
-      // Agregar información del museo planetario
-      const instructionsDiv = document.getElementById('instructions');
-      const planetInfo = document.createElement('p');
-      planetInfo.innerHTML = '🪐 Descubre los <strong>9 cuerpos celestes</strong> de nuestro sistema solar';
-      planetInfo.style.color = '#64ffda';
-      planetInfo.style.fontWeight = 'bold';
-      instructionsDiv.insertBefore(planetInfo, instructionsDiv.lastElementChild);
+      const mobileControlsEl = document.getElementById('mobileControls');
+      const menuBtn = document.getElementById('menuBtn');
       
       startButton.addEventListener('click', () => {
         controls.lock();
+      });
+      
+      // Menu button para móviles
+      menuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (controls.isLocked) {
+          controls.unlock();
+        }
       });
       
       controls.addEventListener('lock', () => {
         blocker.style.display = 'none';
         controlsEl.classList.add('show');
         crosshair.classList.add('show');
+        
+        if (isMobile) {
+          mobileControlsEl.classList.add('show');
+          menuBtn.classList.add('show');
+        }
       });
       
       controls.addEventListener('unlock', () => {
@@ -1072,10 +1315,15 @@ ${description}
         controlsEl.classList.remove('show');
         crosshair.classList.remove('show');
         infoBox.style.display = 'none';
+        
+        if (isMobile) {
+          mobileControlsEl.classList.remove('show');
+          menuBtn.classList.remove('show');
+        }
       });
     }
 
-    // Animaciones y efectos
+    // Animaciones
     const animatedObjects = [];
 
     function addAnimations() {
@@ -1088,14 +1336,6 @@ ${description}
             floatSpeed: Math.random() * 1 + 0.5,
             floatAmount: 0.1
           });
-        } else if (obj.userData.type === 'sculpture') {
-          animatedObjects.push({
-            object: obj,
-            originalY: obj.position.y,
-            rotationSpeed: (Math.random() - 0.5) * 0.5,
-            floatSpeed: Math.random() * 2 + 1,
-            floatAmount: 0.2
-          });
         }
       });
     }
@@ -1103,51 +1343,113 @@ ${description}
     function updateAnimations(time) {
       animatedObjects.forEach(anim => {
         if (anim.object.userData.type === 'planet') {
-          // Rotación específica de cada planeta
           anim.object.rotation.y += anim.object.userData.rotationSpeed * 0.016;
           
-          // Flotación sutil para planetas
           anim.object.position.y = anim.originalY + 
             Math.sin(time * anim.floatSpeed) * anim.floatAmount * 0.3;
             
-          // Efectos especiales para el Sol
           if (anim.object.userData.name === 'Sol') {
-            // Pulsación de brillo
             const pulsation = (Math.sin(time * 2) + 1) * 0.5;
             anim.object.material.emissiveIntensity = 0.2 + pulsation * 0.2;
           }
           
-          // Efectos para planetas con anillos
           if (anim.object.children.length > 0) {
             anim.object.children.forEach(child => {
               if (child.geometry && child.geometry.type === 'RingGeometry') {
-                child.rotation.z += 0.01; // Rotación lenta de anillos
+                child.rotation.z += 0.01;
               }
             });
           }
-        } else {
-          // Animación original para otras esculturas
-          anim.object.rotation.y += anim.rotationSpeed * 0.016;
-          anim.object.position.y = anim.originalY + 
-            Math.sin(time * anim.floatSpeed) * anim.floatAmount;
         }
       });
     }
 
-    // Sistema de partículas ambiente optimizado para móvil
+    function checkProximity() {
+      const playerPos = camera.position.clone();
+      
+      museumObjects.forEach(obj => {
+        if (!obj.userData.info) return;
+        
+        const distance = playerPos.distanceTo(obj.position);
+        const proximityRadius = obj.userData.type === 'planet' ? 5 : 4;
+        
+        if (distance < proximityRadius) {
+          if (obj.material && !obj.userData.highlighted) {
+            obj.userData.originalEmissive = obj.material.emissive.clone();
+            obj.material.emissive.setHex(0x222222);
+            obj.userData.highlighted = true;
+          }
+        } else if (obj.userData.highlighted) {
+          if (obj.material && obj.userData.originalEmissive) {
+            obj.material.emissive.copy(obj.userData.originalEmissive);
+            obj.userData.highlighted = false;
+          }
+        }
+      });
+    }
+
+    // Bucle de renderizado
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      handleMovement(delta);
+      updateAnimations(time);
+      checkProximity();
+      
+      camera.position.y += Math.sin(time * 2) * 0.002;
+      
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    window.addEventListener('resize', onWindowResize);
+
+    // Loading manager
+    const loadingManager = new THREE.LoadingManager();
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingProgress = document.getElementById('loadingProgress');
+    
+    loadingManager.onStart = () => {
+      loadingBar.style.display = 'block';
+    };
+    
+    loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const progress = (itemsLoaded / itemsTotal) * 100;
+      loadingProgress.style.width = progress + '%';
+    };
+    
+    loadingManager.onLoad = () => {
+      setTimeout(() => {
+        loadingBar.style.display = 'none';
+      }, 500);
+    };
+
+    // Iniciar aplicación
+    init();
+    addAnimations();
+    
+    // Sistema de partículas ambiente optimizado para móviles
     function createAmbientParticles() {
-      const particleCount = isMobileDevice ? 25 : 150; // Reducido aún más en móvil
+      const particleCount = isMobile ? 50 : 200; // Menos partículas en móvil
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(particleCount * 3);
       const colors = new Float32Array(particleCount * 3);
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-
-        positions[i3] = (Math.random() - 0.5) * WALL_LENGTH * 0.9; // Distribuidas en toda la sala
+        
+        positions[i3] = (Math.random() - 0.5) * WALL_LENGTH * 0.9;
         positions[i3 + 1] = Math.random() * WALL_HEIGHT * 0.8;
         positions[i3 + 2] = (Math.random() - 0.5) * WALL_LENGTH * 0.9;
-
+        
         const color = new THREE.Color();
         color.setHSL(Math.random(), 0.7, 0.5);
         colors[i3] = color.r;
@@ -1159,24 +1461,66 @@ ${description}
       geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
       const material = new THREE.PointsMaterial({
-        size: isMobileDevice ? 0.05 : 0.08, // Partículas más pequeñas en móvil
+        size: isMobile ? 0.06 : 0.08,
         vertexColors: true,
         transparent: true,
-        opacity: isMobileDevice ? 0.3 : 0.4, // Menos opacidad en móvil
+        opacity: 0.4,
         blending: THREE.AdditiveBlending
       });
 
       const particles = new THREE.Points(geometry, material);
       scene.add(particles);
-
+      
       return particles;
     }
 
-    // Audio ambiente (simulado con Web Audio API)
+    const particles = createAmbientParticles();
+    
+    // Optimización de rendimiento para móviles
+    if (isMobile) {
+      // Reducir calidad de sombras
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.BasicShadowMap;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      
+      // Fog más denso para ocultar objetos lejanos
+      scene.fog = new THREE.Fog(0x0a0a0a, 15, 80);
+      
+      // Reducir calidad de texturas
+      renderer.capabilities.getMaxAnisotropy = () => 1;
+    }
+
+    // Prevenir comportamientos no deseados en móvil
+    if (isMobile) {
+      // Deshabilitar selección de texto
+      document.body.style.webkitUserSelect = 'none';
+      document.body.style.webkitTouchCallout = 'none';
+      document.body.style.webkitTapHighlightColor = 'rgba(0, 0, 0, 0)';
+      
+      // Prevenir scroll del body
+      document.body.addEventListener('touchmove', function(e) {
+        if (controls.isLocked) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+      
+      // Manejar orientación
+      window.addEventListener('orientationchange', function() {
+        setTimeout(() => {
+          onWindowResize();
+        }, 500);
+      });
+    }
+
+    animate();
+
+    // Audio ambiente simulado (solo si no es móvil para mejor rendimiento)
     let audioContext;
     let ambientSound;
 
     function initAudio() {
+      if (isMobile) return; // Skip audio en móviles
+      
       try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         createAmbientSound();
@@ -1204,262 +1548,82 @@ ${description}
       ambientSound = { oscillator, gainNode };
     }
 
-    // Post-procesado visual
-    function createPostProcessing() {
-      // Simular efectos de post-procesado con ajustes del renderer
-      renderer.toneMappingExposure = 1.2;
-      
-      // Efecto de viñeta simulado con CSS
-      const style = document.createElement('style');
-      style.textContent = `
-        canvas {
-          box-shadow: inset 0 0 200px rgba(0,0,0,0.3);
-        }
-      `;
-      document.head.appendChild(style);
+    if (!isMobile) {
+      initAudio();
     }
 
-    // Sistema de detección de proximidad para sala grande
-    function checkProximity() {
-      const playerPos = camera.position.clone();
-      
-      museumObjects.forEach(obj => {
-        if (!obj.userData.info) return;
+    // Easter eggs solo para desktop
+    if (!isMobile) {
+      let konamiCode = [];
+      const konamiSequence = [
+        'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+        'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+        'KeyB', 'KeyA'
+      ];
+
+      document.addEventListener('keydown', (e) => {
+        konamiCode.push(e.code);
+        if (konamiCode.length > konamiSequence.length) {
+          konamiCode.shift();
+        }
         
-        const distance = playerPos.distanceTo(obj.position);
-        const proximityRadius = obj.userData.type === 'planet' ? 5 : 4; // Radio mayor para detección
-        
-        if (distance < proximityRadius) {
-          // Efecto de resaltado sutil
-          if (obj.material && !obj.userData.highlighted) {
-            obj.userData.originalEmissive = obj.material.emissive.clone();
-            obj.material.emissive.setHex(0x222222);
-            obj.userData.highlighted = true;
-          }
-        } else if (obj.userData.highlighted) {
-          // Restaurar estado original
-          if (obj.material && obj.userData.originalEmissive) {
-            obj.material.emissive.copy(obj.userData.originalEmissive);
-            obj.userData.highlighted = false;
-          }
+        if (konamiCode.join(',') === konamiSequence.join(',')) {
+          scene.background = new THREE.Color().setHSL(Math.random(), 0.7, 0.3);
+          showInfo('🎉 ¡Has descubierto un secreto! El museo se transforma...');
+          konamiCode = [];
+        }
+      });
+
+      // Modo debug (Ctrl+Shift+D)
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && e.code === 'KeyD') {
+          const stats = `
+Posición: (${camera.position.x.toFixed(2)}, ${camera.position.y.toFixed(2)}, ${camera.position.z.toFixed(2)})
+Objetos: ${scene.children.length}
+FPS: ${Math.round(1 / clock.getDelta())}
+Dispositivo: ${isMobile ? 'Móvil' : 'Desktop'}
+          `;
+          console.log(stats);
+          showInfo('Debug info logged to console');
         }
       });
     }
 
-    // Bucle de renderizado principal
-    function animate() {
-      requestAnimationFrame(animate);
+    // Performance monitor simple para móvil
+    if (isMobile) {
+      let frameCount = 0;
+      let lastTime = performance.now();
       
-      const delta = clock.getDelta();
-      const time = clock.getElapsedTime();
-
-      handleMovement(delta);
-      updateAnimations(time);
-      checkProximity();
+      function checkPerformance() {
+        frameCount++;
+        const currentTime = performance.now();
+        
+        if (currentTime - lastTime >= 5000) { // Check every 5 seconds
+          const fps = (frameCount * 1000) / (currentTime - lastTime);
+          
+          if (fps < 20) {
+            // Reduce quality further if FPS is too low
+            scene.fog = new THREE.Fog(0x0a0a0a, 10, 50);
+            renderer.setPixelRatio(1);
+            
+            console.log('Performance optimized for low FPS:', fps.toFixed(1));
+          }
+          
+          frameCount = 0;
+          lastTime = currentTime;
+        }
+        
+        setTimeout(checkPerformance, 100);
+      }
       
-      // Efectos de cámara
-      camera.position.y += Math.sin(time * 2) * 0.002; // Respiración sutil
-      
-      renderer.render(scene, camera);
+      setTimeout(checkPerformance, 5000);
     }
-
-    // Manejo de redimensionado
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    window.addEventListener('resize', onWindowResize);
-
-    // Loading manager con progreso
-    const loadingManager = new THREE.LoadingManager();
-    const loadingBar = document.getElementById('loadingBar');
-    const loadingProgress = document.getElementById('loadingProgress');
-    
-    loadingManager.onStart = () => {
-      loadingBar.style.display = 'block';
-    };
-    
-    loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-      const progress = (itemsLoaded / itemsTotal) * 100;
-      loadingProgress.style.width = progress + '%';
-    };
-    
-    loadingManager.onLoad = () => {
-      setTimeout(() => {
-        loadingBar.style.display = 'none';
-      }, 500);
-    };
-
-    // Iniciar aplicación
-    init();
-    addAnimations();
-    const particles = createAmbientParticles();
-    initAudio();
-    createPostProcessing();
-    animate();
-
-    // Easter eggs y características especiales
-    let konamiCode = [];
-    const konamiSequence = [
-      'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-      'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
-      'KeyB', 'KeyA'
-    ];
-
-    document.addEventListener('keydown', (e) => {
-      konamiCode.push(e.code);
-      if (konamiCode.length > konamiSequence.length) {
-        konamiCode.shift();
-      }
-      
-      if (konamiCode.join(',') === konamiSequence.join(',')) {
-        // Efecto especial
-        scene.background = new THREE.Color().setHSL(Math.random(), 0.7, 0.3);
-        showInfo('🎉 ¡Has descubierto un secreto! El museo se transforma...');
-        konamiCode = [];
-      }
-    });
-
-    // Modo debug (Ctrl+Shift+D)
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.shiftKey && e.code === 'KeyD') {
-        const stats = `
-Posición: (${camera.position.x.toFixed(2)}, ${camera.position.y.toFixed(2)}, ${camera.position.z.toFixed(2)})
-Objetos: ${scene.children.length}
-FPS: ${Math.round(1 / clock.getDelta())}
-        `;
-        console.log(stats);
-        showInfo('Debug info logged to console');
-      }
-    });
 
     console.log('🎨 Museo Virtual 3D cargado exitosamente!');
-    console.log('💡 Tip: Presiona Ctrl+Shift+D para información de debug');
-    console.log('🎮 Tip: ¿Conoces el código Konami?');
-  </script>
-
-  <style>
-  /* Controles táctiles para móvil */
-  #touchControls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 15px;
-    z-index: 30;
-    user-select: none;
-    touch-action: none;
-    pointer-events: auto;
-  }
-
-    .touchButton {
-      width: 60px;
-      height: 60px;
-      background: rgba(100, 255, 218, 0.7);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 30px;
-      color: #0a0a0a;
-      box-shadow: 0 0 10px rgba(100, 255, 218, 0.8);
-      cursor: pointer;
-      transition: background 0.3s ease;
-      user-select: none;
-    }
-
-    .touchButton:active {
-      background: rgba(100, 255, 218, 1);
-    }
-  </style>
-
-  <div id="touchControls" style="display:none;">
-    <div id="btnUp" class="touchButton">&#9650;</div>
-    <div id="btnLeft" class="touchButton">&#9664;</div>
-    <div id="btnDown" class="touchButton">&#9660;</div>
-    <div id="btnRight" class="touchButton">&#9654;</div>
-  </div>
-
-  <script>
-    // Detectar si es dispositivo móvil
-    function isMobile() {
-      return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-    }
-
-    // Mostrar controles táctiles si es móvil y no está en modo pointer lock
-    if (isMobile() && !document.pointerLockElement) {
-      document.getElementById('touchControls').style.display = 'flex';
-    }
-
-    // Variables para controlar movimiento táctil
-    const touchKeys = {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false
-    };
-
-    // Funciones para manejar eventos táctiles
-    function setTouchKey(key, value) {
-      touchKeys[key] = value;
-    }
-
-    // Añadir eventos táctiles a botones
-    function preventDefaultTouch(event) {
-      event.preventDefault();
-    }
-    const btnUp = document.getElementById('btnUp');
-    const btnLeft = document.getElementById('btnLeft');
-    const btnDown = document.getElementById('btnDown');
-    const btnRight = document.getElementById('btnRight');
-
-    btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowUp', true); });
-    btnUp.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowUp', false); });
-    btnUp.addEventListener('touchmove', preventDefaultTouch);
-
-    btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowLeft', true); });
-    btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowLeft', false); });
-    btnLeft.addEventListener('touchmove', preventDefaultTouch);
-
-    btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowDown', true); });
-    btnDown.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowDown', false); });
-    btnDown.addEventListener('touchmove', preventDefaultTouch);
-
-    btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); setTouchKey('ArrowRight', true); });
-    btnRight.addEventListener('touchend', (e) => { e.preventDefault(); setTouchKey('ArrowRight', false); });
-    btnRight.addEventListener('touchmove', preventDefaultTouch);
-
-    // Modificar la función handleMovement para incluir controles táctiles
-    const originalHandleMovement = handleMovement;
-    function handleMovement(delta) {
-      if (!controls.isLocked) return;
-
-      let forward = 0, right = 0;
-      const currentSpeed = keys['ShiftLeft'] ? sprintSpeed : moveSpeed;
-
-      if (keys['KeyW'] || touchKeys['ArrowUp']) forward += 1;
-      if (keys['KeyS'] || touchKeys['ArrowDown']) forward -= 1;
-      if (keys['KeyD'] || touchKeys['ArrowRight']) right += 1;
-      if (keys['KeyA'] || touchKeys['ArrowLeft']) right -= 1;
-
-      const length = Math.hypot(forward, right);
-      if (length > 0) {
-        forward /= length;
-        right /= length;
-      }
-
-      controls.moveForward(forward * currentSpeed * delta);
-      controls.moveRight(right * currentSpeed * delta);
-
-      // Colisiones
-      applyCollisions();
-      camera.position.y = 1.6; // Altura fija
+    console.log('📱 Dispositivo detectado:', isMobile ? 'Móvil' : 'Desktop');
+    if (!isMobile) {
+      console.log('💡 Tip: Presiona Ctrl+Shift+D para información de debug');
+      console.log('🎮 Tip: ¿Conoces el código Konami?');
     }
   </script>
 </body>
