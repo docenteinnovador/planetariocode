@@ -439,22 +439,11 @@
       const menuBtn = document.getElementById('menuBtn');
 
       mobileMenuToggle.addEventListener('click', () => {
-        if (blocker.style.display === 'none') {
-          // Show menu screen
-          blocker.style.display = 'flex';
+        // Toggle only the visibility of the controls menu box
+        if (controlsEl.classList.contains('show')) {
           controlsEl.classList.remove('show');
-          crosshair.classList.remove('show');
-          mobileControlsEl.classList.remove('show');
-          menuBtn.classList.remove('show');
-          controls.unlock();
         } else {
-          // Hide menu screen
-          blocker.style.display = 'none';
           controlsEl.classList.add('show');
-          crosshair.classList.add('show');
-          mobileControlsEl.classList.add('show');
-          menuBtn.classList.add('show');
-          controls.lock();
         }
       });
     }
