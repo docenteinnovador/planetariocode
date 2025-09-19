@@ -219,8 +219,8 @@
       position: absolute;
       right: 0;
       bottom: 0;
-      width: 40%;
-      height: 80%;
+      width: 60%;
+      height: 100%;
       background: rgba(0,0,0,0.05);
       border: 1px solid rgba(100,255,218,0.2);
       border-radius: 10px 0 0 0;
@@ -390,8 +390,7 @@
     <div class="mobile-button" id="interactBtn">👆</div>
   </div>
 
-  <div class="mobile-button" id="menuBtn"></div>
-
+  <div class="mobile-button" id="menuBtn">☰</div>
 
   <div class="crosshair"></div>
   
@@ -427,23 +426,6 @@
 
       document.addEventListener('gesturestart', function(e) {
         e.preventDefault();
-      });
-
-      // Toggle menu screen on mobile button click
-      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-      const blocker = document.getElementById('blocker');
-      const controlsEl = document.getElementById('controls');
-      const crosshair = document.querySelector('.crosshair');
-      const mobileControlsEl = document.getElementById('mobileControls');
-      const menuBtn = document.getElementById('menuBtn');
-
-      mobileMenuToggle.addEventListener('click', () => {
-        // Toggle only the visibility of the controls menu box
-        if (controlsEl.classList.contains('show')) {
-          controlsEl.classList.remove('show');
-        } else {
-          controlsEl.classList.add('show');
-        }
       });
     }
 
@@ -1309,41 +1291,33 @@ ${description}
         controls.lock();
       });
       
-      // Menu button
+      // Menu button para móviles
       menuBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (isMobile) {
-          if (controls.isLocked) {
-            controls.unlock();
-          }
-        } else {
-          toggleControls();
+        if (controls.isLocked) {
+          controls.unlock();
         }
       });
       
       controls.addEventListener('lock', () => {
         blocker.style.display = 'none';
-        // Do not show controlsEl by default on lock
-        // controlsEl.classList.add('show');
+        controlsEl.classList.add('show');
         crosshair.classList.add('show');
-
+        
         if (isMobile) {
           mobileControlsEl.classList.add('show');
-        } else {
           menuBtn.classList.add('show');
         }
       });
       
       controls.addEventListener('unlock', () => {
         blocker.style.display = 'flex';
-        // Ensure controlsEl is hidden on unlock
         controlsEl.classList.remove('show');
         crosshair.classList.remove('show');
         infoBox.style.display = 'none';
-
+        
         if (isMobile) {
           mobileControlsEl.classList.remove('show');
-        } else {
           menuBtn.classList.remove('show');
         }
       });
