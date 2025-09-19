@@ -390,9 +390,8 @@
     <div class="mobile-button" id="interactBtn">👆</div>
   </div>
 
-  <div class="mobile-button" id="menuBtn">☰</div>
+  <div class="mobile-button" id="menuBtn"></div>
 
-  <!-- Removed mobileMenuToggle button as per user request -->
 
   <div class="crosshair"></div>
   
@@ -1310,11 +1309,15 @@ ${description}
         controls.lock();
       });
       
-      // Menu button para móviles
+      // Menu button
       menuBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (controls.isLocked) {
-          controls.unlock();
+        if (isMobile) {
+          if (controls.isLocked) {
+            controls.unlock();
+          }
+        } else {
+          toggleControls();
         }
       });
       
@@ -1323,9 +1326,10 @@ ${description}
         // Do not show controlsEl by default on lock
         // controlsEl.classList.add('show');
         crosshair.classList.add('show');
-        
+
         if (isMobile) {
           mobileControlsEl.classList.add('show');
+        } else {
           menuBtn.classList.add('show');
         }
       });
@@ -1336,9 +1340,10 @@ ${description}
         controlsEl.classList.remove('show');
         crosshair.classList.remove('show');
         infoBox.style.display = 'none';
-        
+
         if (isMobile) {
           mobileControlsEl.classList.remove('show');
+        } else {
           menuBtn.classList.remove('show');
         }
       });
