@@ -379,6 +379,7 @@
       </div>
       <p>🖼️ Explora las obras de arte y descubre los secretos del sistema solar</p>
       <p id="planetInfo" style="color: #64ffda; font-weight: bold;">🪐 Descubre los 9 cuerpos celestes de nuestro sistema solar</p>
+      <p style="font-size: 0.9em; color: #64ffda; margin-top: 20px; text-align: center;">Diseñado y creado por LCDO. JORGE CORNEJO</p>
       <button id="startButton">✨ Comenzar Experiencia</button>
     </div>
   </div>
@@ -536,9 +537,9 @@
     const textureLoader = new THREE.TextureLoader();
     const museumObjects = [];
     
-    // Configuración inicial
-    scene.background = new THREE.Color(0x0a0a0a);
-    scene.fog = new THREE.Fog(0x0a0a0a, 20, 120);
+    // Configuración inicial con fondo más oscuro
+    scene.background = new THREE.Color(0x0a0a0a); // Más oscuro que antes
+    scene.fog = new THREE.Fog(0x0a0a0a, 25, 120); // Fog más oscuro y cercano
     
     camera.position.set(0, 1.6, 25);
     
@@ -547,7 +548,7 @@
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.8;
+    renderer.toneMappingExposure = 1.4; // Aumentado de 0.8 a 1.4 para más brillo
     document.body.appendChild(renderer.domElement);
 
     // Constantes del museo
@@ -688,12 +689,14 @@
       }
     }
 
-    // Sistema de iluminación
+    // Sistema de iluminación mejorado
     function createLighting() {
-      const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+      // Luz ambiental más tenue para ambiente más oscuro
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.3); // Reducido de 0.8 a 0.3
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      // Luz direccional principal más brillante
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8); // Aumentado de 1.2 a 1.8
       directionalLight.position.set(15, 25, 10);
       directionalLight.castShadow = true;
       directionalLight.shadow.mapSize.width = 2048;
@@ -706,16 +709,25 @@
       directionalLight.shadow.camera.bottom = -50;
       scene.add(directionalLight);
 
+      // Luces adicionales para iluminación general
+      const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.6);
+      fillLight1.position.set(-15, 20, 15);
+      scene.add(fillLight1);
+
+      const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+      fillLight2.position.set(0, 15, -20);
+      scene.add(fillLight2);
+
       const artworkLights = [
-        { pos: [-20, 6, -25], color: 0xffd700, intensity: 1.5 },
-        { pos: [20, 6, -25], color: 0x64ffda, intensity: 1.5 },
-        { pos: [-25, 6, 0], color: 0xff6b9d, intensity: 1.5 },
-        { pos: [25, 6, 0], color: 0x4fc3f7, intensity: 1.5 },
-        { pos: [0, 10, -15], color: 0xffaa00, intensity: 2 },
-        { pos: [-15, 8, -10], color: 0x8c7853, intensity: 1 },
-        { pos: [-20, 8, 5], color: 0xffc649, intensity: 1 },
-        { pos: [15, 8, 10], color: 0xd8ca9d, intensity: 1.2 },
-        { pos: [20, 8, 5], color: 0xfad5a5, intensity: 1.2 }
+        { pos: [-20, 6, -25], color: 0xffd700, intensity: 2.0 }, // Aumentado
+        { pos: [20, 6, -25], color: 0x64ffda, intensity: 2.0 },
+        { pos: [-25, 6, 0], color: 0xff6b9d, intensity: 2.0 },
+        { pos: [25, 6, 0], color: 0x4fc3f7, intensity: 2.0 },
+        { pos: [0, 10, -15], color: 0xffaa00, intensity: 2.5 }, // Iluminación especial para el Sol
+        { pos: [-15, 8, -10], color: 0x8c7853, intensity: 1.5 },
+        { pos: [-20, 8, 5], color: 0xffc649, intensity: 1.5 },
+        { pos: [15, 8, 10], color: 0xd8ca9d, intensity: 1.8 },
+        { pos: [20, 8, 5], color: 0xfad5a5, intensity: 1.8 }
       ];
 
       artworkLights.forEach(light => {
@@ -728,32 +740,20 @@
       });
     }
 
-    // Creación del suelo
+    // Creación del suelo con textura más clara
     function createFloor() {
       const floorGeometry = new THREE.PlaneGeometry(WALL_LENGTH, WALL_LENGTH, 50, 50);
       
       const floorMaterial = new THREE.MeshStandardMaterial({
-        color: 0x2a2a2a,
-        roughness: 0.8,
-        metalness: 0.1
+        color: 0x333333, // Mucho más oscuro para el planetario
+        roughness: 0.6, // Menos rugoso para más brillo
+        metalness: 0.2
       });
 
-      const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-      
-      const tileSize = 64;
-      for (let x = 0; x < 8; x++) {
-        for (let y = 0; y < 8; y++) {
-          ctx.fillStyle = (x + y) % 2 ? '#1a1a1a' : '#2a2a2a';
-          ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-        }
-      }
-      
-      const floorTexture = new THREE.CanvasTexture(canvas);
+      const floorTexture = textureLoader.load('texture4.jpg');
       floorTexture.wrapS = THREE.RepeatWrapping;
       floorTexture.wrapT = THREE.RepeatWrapping;
-      floorTexture.repeat.set(4, 4);
+      floorTexture.repeat.set(2, 8);
       
       floorMaterial.map = floorTexture;
 
@@ -763,23 +763,32 @@
       scene.add(floor);
     }
 
-    // Paredes
+    // Paredes más claras
     function createWalls() {
       const wallMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1a1a2e,
-        roughness: 0.9,
-        metalness: 0.1
+        color: 0x4a4a6e, // Color más claro
+        roughness: 0.7, // Menos rugoso
+        metalness: 0.2
       });
 
       const wallCanvas = document.createElement('canvas');
-      wallCanvas.width = wallCanvas.height = 256;
+      wallCanvas.width = wallCanvas.height = 512;
       const wallCtx = wallCanvas.getContext('2d');
       
-      const gradient = wallCtx.createLinearGradient(0, 0, 0, 256);
-      gradient.addColorStop(0, '#2a2a4e');
-      gradient.addColorStop(1, '#1a1a2e');
+      // Gradiente más claro
+      const gradient = wallCtx.createLinearGradient(0, 0, 0, 512);
+      gradient.addColorStop(0, '#6a6a8e'); // Más claro
+      gradient.addColorStop(0.5, '#5a5a7e'); // Más claro
+      gradient.addColorStop(1, '#4a4a6e'); // Más claro
       wallCtx.fillStyle = gradient;
-      wallCtx.fillRect(0, 0, 256, 256);
+      wallCtx.fillRect(0, 0, 512, 512);
+      
+      // Añadir textura sutil
+      wallCtx.globalAlpha = 0.1;
+      for (let i = 0; i < 100; i++) {
+        wallCtx.fillStyle = '#ffffff';
+        wallCtx.fillRect(Math.random() * 512, Math.random() * 512, 2, Math.random() * 20);
+      }
       
       const wallTexture = new THREE.CanvasTexture(wallCanvas);
       wallTexture.wrapS = THREE.RepeatWrapping;
@@ -804,8 +813,13 @@
 
       createEntranceWall();
       
+      // Techo más claro
       const ceilingGeometry = new THREE.PlaneGeometry(WALL_LENGTH, WALL_LENGTH);
-      const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0x0a0a0a });
+      const ceilingMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x2a2a2a, // Más claro que antes
+        emissive: 0x111111, // Ligero brillo
+        emissiveIntensity: 0.1
+      });
       const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
       ceiling.rotation.x = Math.PI / 2;
       ceiling.position.y = WALL_HEIGHT;
@@ -870,6 +884,35 @@
       museumObjects.push(frame);
       
       return frame;
+    }
+    
+    // Crear placa de crédito
+    function createCreditSign() {
+      const creditGeo = new THREE.PlaneGeometry(14, 3);
+      const canvas = document.createElement('canvas');
+      canvas.width = 1060;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = '#222222cc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.font = '48px Arial';
+      ctx.fillStyle = '#64ffda';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('DISEÑADO Y CREADO POR CODEROBOTICS', canvas.width / 2, canvas.height / 2);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+      const mesh = new THREE.Mesh(creditGeo, material);
+      
+      mesh.position.set(0, 1, 28);
+      mesh.rotation.y = Math.PI;
+      scene.add(mesh);
+      museumObjects.push(mesh);
+      
+      return mesh;
     }
 
     function createProceduralArt(color) {
@@ -1051,6 +1094,9 @@ ${description}
 
     // Crear contenido del museo
     function createMuseumContent() {
+      // Crear placa de crédito
+      createCreditSign();
+
       const artworks = [
         { pos: [-20, 4, -29.7], rot: 0, title: "Sinfonía Dorada", desc: "Una composición visual que captura la armonía entre luz y sombra.", color: 0xffd700 },
         { pos: [20, 4, -29.7], rot: 0, title: "Océano Digital", desc: "Exploración de las corrientes virtuales en el mundo moderno.", color: 0x64ffda },
@@ -1061,11 +1107,11 @@ ${description}
         { pos: [-29.7, 4, -10], rot: Math.PI/2, title: "Galaxia Espiral", desc: "Millones de estrellas girando en perfecta armonía.", color: 0xffffff },
         { pos: [-29.7, 4, 10], rot: Math.PI/2, title: "Agujero Negro", desc: "Donde el tiempo y el espacio se curvan infinitamente.", color: 0x330066 }
       ];
-      
+
       artworks.forEach(art => {
         createArtwork(...art.pos, art.rot, art.title, art.desc, art.color);
       });
-      
+
       const planetsData = [
         {
           name: "Sol", radius: 2.5, color: 0xffaa00, texture: 'solar', rotationSpeed: 0.5,
@@ -1645,5 +1691,7 @@ Dispositivo: ${isMobile ? 'Móvil' : 'Desktop'}
       console.log('🎮 Tip: ¿Conoces el código Konami?');
     }
   </script>
+
+  
 </body>
 </html>
