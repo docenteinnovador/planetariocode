@@ -147,6 +147,17 @@
       display: block;
     }
 
+    /* Ocultar controles completamente en móvil */
+    @media (max-width: 768px) {
+      #controls {
+        display: none !important;
+      }
+      
+      #controls.show {
+        display: none !important;
+      }
+    }
+
     .control-item {
       margin: 5px 0;
       display: flex;
@@ -1301,8 +1312,12 @@ ${description}
       
       controls.addEventListener('lock', () => {
         blocker.style.display = 'none';
-        controlsEl.classList.add('show');
         crosshair.classList.add('show');
+        
+        // Solo mostrar controles de teclado en desktop
+        if (!isMobile) {
+          controlsEl.classList.add('show');
+        }
         
         if (isMobile) {
           mobileControlsEl.classList.add('show');
@@ -1312,9 +1327,13 @@ ${description}
       
       controls.addEventListener('unlock', () => {
         blocker.style.display = 'flex';
-        controlsEl.classList.remove('show');
         crosshair.classList.remove('show');
         infoBox.style.display = 'none';
+        
+        // Solo ocultar controles de teclado en desktop
+        if (!isMobile) {
+          controlsEl.classList.remove('show');
+        }
         
         if (isMobile) {
           mobileControlsEl.classList.remove('show');
