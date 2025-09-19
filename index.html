@@ -219,8 +219,8 @@
       position: absolute;
       right: 0;
       bottom: 0;
-      width: 60%;
-      height: 100%;
+      width: 40%;
+      height: 80%;
       background: rgba(0,0,0,0.05);
       border: 1px solid rgba(100,255,218,0.2);
       border-radius: 10px 0 0 0;
@@ -392,7 +392,7 @@
 
   <div class="mobile-button" id="menuBtn">☰</div>
 
-  <div class="mobile-button" id="mobileMenuToggle" style="bottom: 20px; right: 20px; background: linear-gradient(135deg, rgba(255, 107, 157, 0.8), rgba(102, 126, 234, 0.8)); box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);">&#9776;</div>
+  <!-- Removed mobileMenuToggle button as per user request -->
 
   <div class="crosshair"></div>
   
@@ -1320,7 +1320,8 @@ ${description}
       
       controls.addEventListener('lock', () => {
         blocker.style.display = 'none';
-        controlsEl.classList.add('show');
+        // Do not show controlsEl by default on lock
+        // controlsEl.classList.add('show');
         crosshair.classList.add('show');
         
         if (isMobile) {
@@ -1331,6 +1332,7 @@ ${description}
       
       controls.addEventListener('unlock', () => {
         blocker.style.display = 'flex';
+        // Ensure controlsEl is hidden on unlock
         controlsEl.classList.remove('show');
         crosshair.classList.remove('show');
         infoBox.style.display = 'none';
